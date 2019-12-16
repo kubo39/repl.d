@@ -101,7 +101,7 @@ unittest {
     shouldSuccess(runner.run(q{ writeln(z); }));
     shouldSuccess(runner.run(q{ iota(x).map!(a => a * 2).writeln; }));
     shouldFailure(runner.run(q{ auto a = 8 }), "Primary expression expected");
-    shouldSuccess(runner.run(q{ void func() { writeln("func"); } }));
+    shouldFailure(runner.run(q{ void func() { writeln("func"); } }), "Function declaration not allowed.");
 }
 
 version (unittest) {

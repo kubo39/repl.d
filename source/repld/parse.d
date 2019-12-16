@@ -37,7 +37,7 @@ private class Parser {
             }
         };
         RollbackAllocator rba;
-        auto m = parseModule(tokens, "test.d", &rba, callback);
+        auto m = parseModule(tokens, "temp.d", &rba, callback);
 
         if (messages) return ParseResult(messages);
 
@@ -63,6 +63,14 @@ private class ParseVisitor : ASTVisitor {
 
     override void visit(const Statement st) {
         result = st;
+    }
+
+    override void visit(const FunctionDeclaration decl) {
+        if (decl.name.text == "__func__") {
+            decl.accept(this); 
+        } else {
+            result = [Message(ErrorMessage("Function declaration not allowed."))];
+        }
     }
 }
 
