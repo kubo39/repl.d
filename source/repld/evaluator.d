@@ -28,7 +28,8 @@ class Evaluator {
         auto params = globalVariables.asParams();
         auto decls = globalVariables.getDeclarations;
         auto imports = imports.toString();
-        auto sourceCode = expand!("variableDeclaration.d", type, expr, imports, decls);
+        auto param = import("param.d");
+        auto sourceCode = expand!("variableDeclaration.d", type, expr, imports, param, decls);
 
         auto result = execute!(Tuple!(Variant,string))(sourceCode, params);
         if (type == "auto") {
@@ -45,7 +46,8 @@ class Evaluator {
         auto params = globalVariables.asParams();
         auto decls = globalVariables.getDeclarations;
         auto imports = imports.toString();
-        auto sourceCode = expand!("statement.d", statement, imports, decls);
+        auto param = import("param.d");
+        auto sourceCode = expand!("statement.d", statement, imports, param, decls);
 
         execute!(void, Param)(sourceCode, params);
     }
@@ -54,7 +56,8 @@ class Evaluator {
         auto params = globalVariables.asParams();
         auto decls = globalVariables.getDeclarations;
         auto imports = imports.toString();
-        auto sourceCode = expand!("expression.d", expression, imports, decls);
+        auto param = import("param.d");
+        auto sourceCode = expand!("expression.d", expression, imports, param, decls);
 
         execute!(void, Param)(sourceCode, params);
     }

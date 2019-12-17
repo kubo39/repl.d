@@ -27,14 +27,24 @@ class REPLRunner {
         try {
             if (auto decl = parseResult.peek!(VariableDeclaration)) {
                 foreach (d; decl.declarators) {
-                    evaluator.evalVarDecl(getType(*decl), getName(d), getInitializer(d));
+                    evaluator.evalVarDecl(getType(*decl), d.name.text, conv(d.initializer.tokens));
                 }
                 return success;
             }
             if (auto decl = parseResult.peek!(AutoDeclaration)) {
                 foreach (p; decl.parts) {
-                    evaluator.evalVarDecl("auto", getName(p), getInitializer(p));
+                    evaluator.evalVarDecl("auto", p.identifier.text, conv(p.initializer.tokens));
                 }
+                return success;
+            }
+            if (auto decl = parseResult.peek!(FunctionDeclaration)) {
+                if (decl.templateParameters) {
+                    return fail("Template function is not allowed.");
+                }
+                if (decl.constraint) {
+                    return fail("Template constraint is not allowed.");
+                }
+                evaluator.evalVarDecl("auto", decl.name.text, toLiteral(*decl));
                 return success;
             }
             if (auto decl = parseResult.peek!(ImportDeclaration)) {
@@ -68,25 +78,21 @@ class REPLRunner {
     }
 }
 
-string getType(const VariableDeclaration decl) {
+string getType(VariableDeclaration decl) {
+    // TODO: resolve non-builtin type
     return str(decl.type.type2.builtinType);
 }
 
-string getName(const Declarator decl) {
-    return decl.name.text;
-}
+string toLiteral(FunctionDeclaration decl) {
+    auto returnType = decl.hasAuto ? "auto" : conv(decl.returnType.tokens);
+    auto attributes = (decl.hasRef ? "ref" : "")
+        ~ decl.memberFunctionAttributes.map!(a => conv(a.tokens)).join(" ")
+        ~ decl.attributes.map!(a => conv(a.tokens)).join(" ")
+        ~ decl.storageClasses.map!(c => conv(c.tokens)).join(" ");
+    auto parameters = conv(decl.parameters.tokens);
+    auto functionBody = conv(decl.functionBody.tokens);
 
-string getInitializer(const Declarator decl) {
-    assert(decl.initializer.tokens.length == 1);
-    return decl.initializer.tokens[0].text;
-}
-
-string getName(const AutoDeclarationPart decl) {
-    return decl.identifier.text;
-}
-
-string getInitializer(const AutoDeclarationPart decl) {
-    return conv(decl.initializer.tokens);
+    return format!"function %s %s %s %s"(attributes, returnType, parameters,  functionBody);
 }
 
 string conv(const Token[] tokens) {
@@ -102,6 +108,8 @@ unittest {
     shouldSuccess(runner.run(q{ writeln(z); }));
     shouldSuccess(runner.run(q{ iota(x).map!(a => a * 2).writeln; }));
     shouldSuccess(runner.run(q{ 1+2 }));
+    shouldSuccess(runner.run(q{ void po() { writeln("po"); } }));
+    shouldSuccess(runner.run(q{ po(); }));
     shouldFailure(runner.run(q{ auto a = 8 }), "Primary expression expected");
     // shouldFailure(runner.run(q{ void func() { writeln("func"); } }), "Function declaration not allowed.");
 }

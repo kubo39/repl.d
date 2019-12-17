@@ -73,7 +73,7 @@ private class ReplParser {
     }
 }
 
-private alias ParseTarget = AliasSeq!(VariableDeclaration, AutoDeclaration, ImportDeclaration, Statement, Expression);
+private alias ParseTarget = AliasSeq!(VariableDeclaration, AutoDeclaration, FunctionDeclaration, ImportDeclaration, Statement, Expression);
 alias ErrorMessage = Typedef!string;
 alias WarningMessage = Typedef!string;
 alias Message = Algebraic!(ErrorMessage, WarningMessage);

@@ -1,26 +1,9 @@
+import std : replace, Tuple, Variant;
 ${imports}
 
-import std : replace, Tuple, Variant;
-
+${param}
 ${decls}
-
-struct Param {
-    Tuple!(Variant, string)[string] vals;
-
-    static foreach (decl; decls) {
-        mixin(q{
-            ${type} ${name}() {
-                if (auto val = "${name}" in vals) {
-                    if (auto result = (*val)[0].peek!(${type})) {
-                        return *result;
-                    }
-                }
-                assert(false);
-            }
-        }.replace("${type}", decl.type)
-        .replace("${name}", decl.name));
-    }
-}
+alias Param = ParamTemp!(decls);
 
 void func(Param p) {
     with (p) {
