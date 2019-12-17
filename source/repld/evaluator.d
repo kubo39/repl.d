@@ -103,6 +103,7 @@ class Evaluator {
         const result = executeShell(format!"dmd %s -g -shared -of=%s %s"(sourceFileName, dllName, importSearchPaths.map!(s => "-I"~s).join(" ")));
         enforce!SemanticException(result.status == 0, result.output);
         scope (exit) dllName.fremove();
+        scope (exit) fremove(dllName.setExtension(".o"));
 
         return new DLL(dllName);
     }
