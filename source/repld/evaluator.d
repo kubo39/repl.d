@@ -50,6 +50,15 @@ class Evaluator {
         execute!(void, Param)(sourceCode, params);
     }
 
+    void evalExpression(string expression) {
+        auto params = globalVariables.asParams();
+        auto decls = globalVariables.getDeclarations;
+        auto imports = imports.toString();
+        auto sourceCode = expand!("expression.d", expression, imports, decls);
+
+        execute!(void, Param)(sourceCode, params);
+    }
+
     private string expand(string templateFileName, Args...)() {
         auto result  = import(templateFileName);
         static foreach (arg; Args) {
