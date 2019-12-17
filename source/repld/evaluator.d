@@ -100,7 +100,7 @@ class Evaluator {
         
         auto dllName = tempDir.buildPath(format!"./test%d.so"(dllSeed));
 
-        const result = executeShell(format!"dmd %s -o- -g -shared -of=%s %s"(sourceFileName, dllName, importSearchPaths.map!(s => "-I"~s).join(" ")));
+        const result = executeShell(format!"dmd %s -g -shared -of=%s %s"(sourceFileName, dllName, importSearchPaths.map!(s => "-I"~s).join(" ")));
         enforce!SemanticException(result.status == 0, result.output);
         scope (exit) dllName.fremove();
 
