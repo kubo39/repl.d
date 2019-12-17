@@ -6,4 +6,19 @@ license "proprietary"
 
 dependency "libdparse" version="*"
 libs "dl" "phobos2"
-dflags "-Jtemplate"
+stringImportPaths "template"
+
+configuration "executable" {
+    targetPath "bin"
+    targetType "executable"
+}
+
+configuration "library" {
+    targetPath "lib"
+    targetType "library"
+}
+
+configuration "unittest" {
+    excludedSourceFiles "source/app.d"
+    targetPath "bin"
+}
