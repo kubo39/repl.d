@@ -1,14 +1,12 @@
-import std : replace, Tuple, Variant;
 ${imports}
 
 ${param}
 ${decls}
-alias Param = ParamTemp!(decls);
 
-void func(Param p) {
-    with (p) {
+void __func__(__Param__ __param__) {
+    with (__param__) {
         ${statement}
     }
 }
 
-extern(C) string funcName() { return func.mangleof; }
+extern(C) string __funcName__() { return __func__.mangleof; }

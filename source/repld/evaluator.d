@@ -35,7 +35,7 @@ class Evaluator {
         auto param = import("param.d");
         auto sourceCode = expand!("variableDeclaration.d", type, expr, imports, param, decls);
 
-        auto result = execute!(Tuple!(Variant,string))(sourceCode, params);
+        auto result = executeDeclare(sourceCode, params);
         if (type == "auto") {
             type = result[1];
         }
@@ -53,7 +53,7 @@ class Evaluator {
         auto param = import("param.d");
         auto sourceCode = expand!("statement.d", statement, imports, param, decls);
 
-        execute!(void, Param)(sourceCode, params);
+        execute(sourceCode, params);
     }
 
     void evalExpression(string expression) {
@@ -63,7 +63,7 @@ class Evaluator {
         auto param = import("param.d");
         auto sourceCode = expand!("expression.d", expression, imports, param, decls);
 
-        execute!(void, Param)(sourceCode, params);
+        execute(sourceCode, params);
     }
 
     ref T get(T)(string name) {
@@ -78,20 +78,21 @@ class Evaluator {
         return result;
     }
 
-    private RetType execute(RetType, Param...)(string sourceCode, Param param) {
-        auto dllName = createDLL(sourceCode);
-        scope (exit) dllName.fremove();
-
-        auto dll = new DLL(dllName);
-
-        auto funcName = dll.loadFunction!(string function())("funcName")();
-        
-        auto func = dll.loadFunction!(RetType function(Param))(funcName);
-
-        return func(param);
+    private void execute(string sourceCode, Param param) {
+        auto dll = createDLL(sourceCode);
+        auto funcName = dll.loadFunction!(string function())("__funcName__")();
+        dll.loadFunction!(void function(Param))(funcName)(param);
     }
 
-    private string createDLL(string sourceCode) {
+    private Tuple!(Variant, string) executeDeclare(string sourceCode, Param param) {
+        auto dll = createDLL(sourceCode);
+        auto funcName = dll.loadFunction!(string function())("__funcName__")();
+        auto typeName = dll.loadFunction!(string function())("__typeName__")();
+        auto variable = dll.loadFunction!(Variant function(Param))(funcName)(param);
+        return tuple(variable, typeName);
+    }
+
+    private DLL createDLL(string sourceCode) {
         scope (exit) dllSeed++;
         auto sourceFileName = tempDir.buildPath(format!"test%d.d"(dllSeed));
         sourceFileName.fwrite(sourceCode);
@@ -101,7 +102,8 @@ class Evaluator {
 
         const result = executeShell(format!"dmd %s -g -shared -of=%s"(sourceFileName, dllName));
         enforce!SemanticException(result.status == 0, result.output);
+        scope (exit) dllName.fremove();
 
-        return dllName;
+        return new DLL(dllName);
     }
 }

@@ -25,13 +25,13 @@ class GlobalVariables {
 
     string getDeclarations() {
         return format!q{
-            struct Declaration {
+            struct __Declaration__ {
                 string name;
                 string type;
             }
 
-            enum decls = [%s];
-        }(vs.byKeyValue.map!(p => format!q{Declaration("%s", "%s")}(p.key, p.value[1])).join(", "));
+            enum __decls__ = [%s];
+        }(vs.byKeyValue.map!(p => format!q{__Declaration__("%s", "%s")}(p.key, p.value[1])).join(", "));
     }
 }
 

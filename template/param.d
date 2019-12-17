@@ -1,8 +1,8 @@
-struct ParamTemp(alias decls) {
-    import std : isCallable, ReturnType, Parameters;
+struct __Param__ {
+    import std : Tuple, Variant, isCallable, ReturnType, Parameters, replace;
 
     private Tuple!(Variant, string)[string] __vals__;
-    static foreach (decl; decls) {
+    static foreach (decl; __decls__) {
         mixin(q{
             static if (isCallable!(${type})) {
                 ReturnType!(${type}) ${name}(Parameters!(${type}) p) {

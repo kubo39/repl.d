@@ -1,15 +1,19 @@
-import std : Variant, replace, Tuple, tuple;
+import std : Variant;
 ${imports}
 
-${param}
 ${decls}
-alias Param = ParamTemp!(decls);
+${param}
 
-Tuple!(Variant,string) func(Param p) {
-    with (p) {
-        ${type} v = ${expr};
-        return tuple(Variant(v), typeof(${expr}).stringof);
+Variant __func__(__Param__ __param__) {
+    with (__param__) {
+        ${type} __value__ = ${expr};
+        return Variant(__value__);
     }
 }
 
-extern(C) string funcName() { return func.mangleof; }
+extern(C) string __funcName__() { return __func__.mangleof; }
+extern(C) string __typeName__() { 
+    with (__Param__.init) {
+        return typeof(${expr}).stringof; 
+    }
+}
