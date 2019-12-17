@@ -43,6 +43,9 @@ class Evaluator {
     }
 
     void evalImport(string expr) {
+        auto sourceFileName = createFile(expr);
+        auto result = executeShell(format!"dmd -c -o- %s %s"(sourceFileName, importArg));
+        enforce!SemanticException(result.status == 0, result.output);
         imports.push(expr);
     }
 
@@ -93,18 +96,27 @@ class Evaluator {
     }
 
     private DLL createDLL(string sourceCode) {
-        scope (exit) dllSeed++;
-        auto sourceFileName = tempDir.buildPath(format!"test%d.d"(dllSeed));
-        sourceFileName.fwrite(sourceCode);
+        auto sourceFileName = createFile(sourceCode);
         scope (exit) sourceFileName.fremove();
         
-        auto dllName = tempDir.buildPath(format!"./test%d.so"(dllSeed));
+        auto dllName = sourceFileName.setExtension(".so");
 
-        const result = executeShell(format!"dmd %s -g -shared -of=%s %s"(sourceFileName, dllName, importSearchPaths.map!(s => "-I"~s).join(" ")));
+        const result = executeShell(format!"dmd %s -g -shared -of=%s %s"(sourceFileName, dllName, importArg));
         enforce!SemanticException(result.status == 0, result.output);
         scope (exit) dllName.fremove();
         scope (exit) fremove(dllName.setExtension(".o"));
 
         return new DLL(dllName);
+    }
+
+    private string createFile(string sourceCode) {
+        scope (exit) dllSeed++;
+        auto sourceFileName = tempDir.buildPath(format!"test%d.d"(dllSeed));
+        sourceFileName.fwrite(sourceCode);
+        return sourceFileName;
+    }
+
+    private string importArg() {
+        return importSearchPaths.map!(s => "-I"~s).join(" ");
     }
 }

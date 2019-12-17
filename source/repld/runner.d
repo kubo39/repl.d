@@ -119,6 +119,7 @@ unittest {
     shouldSuccess(runner.run(q{ int x = 3; }));
     shouldSuccess(runner.run(q{ double y = 3.1415; }));
     shouldSuccess(runner.run(q{ import std; }));
+    shouldFailure(runner.run(q{ import unknownPackage; }));
     shouldSuccess(runner.run(q{ auto z = x * y; }));
     shouldSuccess(runner.run(q{ auto t = 3.seconds; }));
     shouldSuccess(runner.run(q{ writeln(z); }));
@@ -140,5 +141,9 @@ version (unittest) {
 
     void shouldFailure(REPLRunner.Result result, string errorMessage) {
         assert(!result.success && result.message.stripRight == errorMessage);
+    }
+
+    void shouldFailure(REPLRunner.Result result) {
+        assert(!result.success);
     }
 }
