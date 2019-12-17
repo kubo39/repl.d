@@ -14,7 +14,7 @@ struct __Param__ {
                     assert(false);
                 }
             } else {
-                ${type} ${name}() {
+                ref ${type} ${name}() {
                     if (auto val = "${name}" in __vals__) {
                         if (auto result = (*val)[0].peek!(${type})) {
                             return *result;

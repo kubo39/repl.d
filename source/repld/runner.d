@@ -123,6 +123,9 @@ unittest {
     shouldSuccess(runner.run(q{ 1+2 }));
     shouldSuccess(runner.run(q{ void po() { writeln("po"); } }));
     shouldSuccess(runner.run(q{ po(); }));
+    shouldSuccess(runner.run(q{ auto doubleX = { return x *= 2; }; }));
+    shouldSuccess(runner.run(q{ doubleX(); }));
+    shouldSuccess(runner.run(q{ assert(x == 6); }));
     shouldFailure(runner.run(q{ auto a = 8 }), "Primary expression expected");
 }
 
