@@ -7,7 +7,6 @@ import repld.moduleimport;
 import repld.dll;
 
 class SemanticException : Exception {
-
     this(string str, string file = __FILE__, size_t line = __LINE__) {
         str = str.split("\n").map!(line => line.canFind(": ") ? line.split(": ")[1..$].join(": ") : line).join("\n");
         super(str);
@@ -18,6 +17,7 @@ class Evaluator {
     private GlobalVariables globalVariables;
     private Imports imports;
     private int dllSeed;
+    package string[] importSearchPaths;
 
     this() {
         this.globalVariables = new GlobalVariables;
@@ -100,7 +100,7 @@ class Evaluator {
         
         auto dllName = tempDir.buildPath(format!"./test%d.so"(dllSeed));
 
-        const result = executeShell(format!"dmd %s -o- -g -shared -of=%s"(sourceFileName, dllName));
+        const result = executeShell(format!"dmd %s -o- -g -shared -of=%s %s"(sourceFileName, dllName, importSearchPaths.map!(s => "-I"~s).join(" ")));
         enforce!SemanticException(result.status == 0, result.output);
         scope (exit) dllName.fremove();
 

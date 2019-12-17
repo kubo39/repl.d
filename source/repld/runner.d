@@ -81,6 +81,10 @@ class REPLRunner {
         set(name, value);
     }
 
+    ref string[] importSearchPaths() {
+        return evaluator.importSearchPaths;
+    }
+
     private Result success() {
         return Result(true);
     }
