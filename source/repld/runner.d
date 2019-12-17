@@ -118,12 +118,12 @@ unittest {
     shouldSuccess(runner.run(q{ auto z = x * y; }));
     shouldSuccess(runner.run(q{ auto t = 3.seconds; }));
     shouldSuccess(runner.run(q{ writeln(z); }));
+    shouldFailure(runner.run(q{ writeln(a); }), "Error: undefined identifier `a`");
     shouldSuccess(runner.run(q{ iota(x).map!(a => a * 2).writeln; }));
     shouldSuccess(runner.run(q{ 1+2 }));
     shouldSuccess(runner.run(q{ void po() { writeln("po"); } }));
     shouldSuccess(runner.run(q{ po(); }));
     shouldFailure(runner.run(q{ auto a = 8 }), "Primary expression expected");
-    // shouldFailure(runner.run(q{ void func() { writeln("func"); } }), "Function declaration not allowed.");
 }
 
 version (unittest) {
@@ -132,6 +132,6 @@ version (unittest) {
     }
 
     void shouldFailure(REPLRunner.Result result, string errorMessage) {
-        assert(!result.success && result.message == errorMessage, result.message);
+        assert(!result.success && result.message.stripRight == errorMessage);
     }
 }
