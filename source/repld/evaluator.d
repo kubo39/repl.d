@@ -71,6 +71,14 @@ class Evaluator {
         execute(sourceCode, params);
     }
 
+    void buildDependency(string packageName, string versionName) {
+        auto sourceCode = expand!("forBuildDependency.d", packageName, versionName);
+        auto sourceFileName = createFile(sourceCode);
+        scope (exit) sourceFileName.fremove();
+        auto result = executeShell("dub run --single " ~ sourceFileName);
+        enforce(result.status == 0, result.output);
+    }
+
     ref T get(T)(string name) {
         return globalVariables.get!T(name);
     }
