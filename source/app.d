@@ -3,9 +3,11 @@ import repld;
 
 void main() {
     auto runner = new REPLRunner();
-    string input;
+    bool shouldExit = false;
+    runner["exit"] = { shouldExit = true; };
 
-    while (true) {
+    string input;
+    while (!shouldExit) {
         write(input ? "| " : "> ");
         input ~= readln;
 

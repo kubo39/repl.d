@@ -24,6 +24,10 @@ class Evaluator {
         this.imports = new Imports;
     }
 
+    void set(T)(string name, T v) {
+        this.globalVariables.set(name, v);
+    }
+
     void evalVarDecl(string type, string name, string expr) {
         auto params = globalVariables.asParams();
         auto decls = globalVariables.getDeclarations;
@@ -35,7 +39,7 @@ class Evaluator {
         if (type == "auto") {
             type = result[1];
         }
-        globalVariables.push(type, name, result[0]);
+        globalVariables.set(type, name, result[0]);
     }
 
     void evalImport(string expr) {
@@ -60,6 +64,10 @@ class Evaluator {
         auto sourceCode = expand!("expression.d", expression, imports, param, decls);
 
         execute!(void, Param)(sourceCode, params);
+    }
+
+    ref T get(T)(string name) {
+        return globalVariables.get!T(name);
     }
 
     private string expand(string templateFileName, Args...)() {

@@ -69,6 +69,18 @@ class REPLRunner {
         return success;
     }
 
+    ref T get(T)(string name) {
+        return evaluator.get!T(name);
+    }
+
+    void set(T)(string name, T v) {
+        evaluator.set(name, v);
+    }
+
+    void opIndexAssign(T)(T value, string name) {
+        set(name, value);
+    }
+
     private Result success() {
         return Result(true);
     }

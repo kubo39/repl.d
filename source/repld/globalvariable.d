@@ -7,8 +7,16 @@ class GlobalVariables {
 
     private Tuple!(Variant, string)[string] vs;
 
-    void push(string type, string name, Variant v) {
+    ref T get(T)(string name) {
+        return *vs[name].peek!T;
+    }
+
+    void set(string type, string name, Variant v) {
         vs[name] = tuple(v, type);
+    }
+
+    void set(T)(string name, T v) {
+        set(T.stringof, name, Variant(v));
     }
 
     auto asParams() {
