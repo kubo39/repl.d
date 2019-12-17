@@ -17,7 +17,9 @@ class Evaluator {
     private GlobalVariables globalVariables;
     private Imports imports;
     private int dllSeed;
-    package string[] importSearchPaths;
+    private string[] importPaths;
+    private string[] libPaths;
+    private string[] libs;
 
     this() {
         this.globalVariables = new GlobalVariables;
@@ -44,7 +46,7 @@ class Evaluator {
 
     void evalImport(string expr) {
         auto sourceFileName = createFile(expr);
-        auto result = executeShell(format!"dmd -c -o- %s %s"(sourceFileName, importArg));
+        auto result = executeShell(format!"dmd -c -o- %s %s"(sourceFileName, args));
         enforce!SemanticException(result.status == 0, result.output);
         imports.push(expr);
     }
@@ -71,6 +73,15 @@ class Evaluator {
 
     ref T get(T)(string name) {
         return globalVariables.get!T(name);
+    }
+
+    alias addImportPath = add!importPaths;
+    alias addLibPath = add!libPaths;
+    alias addLibrary = add!libs;
+
+    private void add(alias mem)(string[] paths) {
+        mem ~= paths;
+        mem = mem.sort.uniq.array;
     }
 
     private string expand(string templateFileName, Args...)() {
@@ -101,7 +112,7 @@ class Evaluator {
         
         auto dllName = sourceFileName.setExtension(".so");
 
-        const result = executeShell(format!"dmd %s -g -shared -of=%s %s"(sourceFileName, dllName, importArg));
+        const result = executeShell(format!"dmd %s -g -shared -of=%s %s"(sourceFileName, dllName, args));
         enforce!SemanticException(result.status == 0, result.output);
         scope (exit) dllName.fremove();
         scope (exit) fremove(dllName.setExtension(".o"));
@@ -116,7 +127,19 @@ class Evaluator {
         return sourceFileName;
     }
 
-    private string importArg() {
-        return importSearchPaths.map!(s => "-I"~s).join(" ");
+    private string args() {
+        return [importSearchArgs, libArgs, libSearchArgs].join(" ");
+    }
+
+    private string importSearchArgs() {
+        return importPaths.map!(s => "-I"~s).join(" ");
+    }
+
+    private string libSearchArgs() {
+        return libPaths.map!(s => "-L-L"~s).join(" ");
+    }
+
+    private string libArgs() {
+        return libs.map!(s => "-L-l"~s).join(" ");
     }
 }

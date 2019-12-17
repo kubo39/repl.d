@@ -69,6 +69,28 @@ class REPLRunner {
         return success;
     }
 
+    void addDependency(string packageName) {
+        evaluator.addImportPath(descirbe(packageName, " --import-paths")
+            .split("\n")
+            .filter!(e => e != "")
+            .array);
+        auto libs = descirbe(packageName, " --data=linker-files")
+            .split(" ")
+            .filter!(e => e != "")
+            .map!(e => e.replaceAll(ctRegex!`'(.*)'`, "$1"))
+            .map!(e => e.stripRight)
+            .array;
+
+        evaluator.addLibPath(libs
+            .map!(l => l.dirName)
+            .array);
+
+        evaluator.addLibrary(libs
+            .map!(l => l.baseName)
+            .map!(l => l.replaceAll(ctRegex!`lib(.*)\.a`, "$1"))
+            .array);
+    }
+
     ref T get(T)(string name) {
         return evaluator.get!T(name);
     }
@@ -81,16 +103,18 @@ class REPLRunner {
         set(name, value);
     }
 
-    ref string[] importSearchPaths() {
-        return evaluator.importSearchPaths;
-    }
-
     private Result success() {
         return Result(true);
     }
 
     private Result fail(string msg) {
         return Result(false, msg);
+    }
+
+    private string descirbe(string packageName, string arg) {
+        auto result = executeShell("dub describe " ~ packageName ~ " " ~ arg);
+        enforce(result.status == 0, result.output);
+        return result.output;
     }
 }
 
@@ -132,6 +156,9 @@ unittest {
     shouldSuccess(runner.run(q{ doubleX(); }));
     shouldSuccess(runner.run(q{ assert(x == 6); }));
     shouldFailure(runner.run(q{ auto a = 8 }), "Primary expression expected");
+    runner.addDependency("sbylib");
+    shouldSuccess(runner.run(q{ import sbylib.math; }));
+    shouldSuccess(runner.run(q{ assert(mat2(1) * vec2(2,3) == vec2(5)); }));
 }
 
 version (unittest) {
