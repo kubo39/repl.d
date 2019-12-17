@@ -79,8 +79,7 @@ class REPLRunner {
 }
 
 string getType(VariableDeclaration decl) {
-    // TODO: resolve non-builtin type
-    return str(decl.type.type2.builtinType);
+    return conv(decl.type.tokens);
 }
 
 string toLiteral(FunctionDeclaration decl) {
@@ -92,7 +91,7 @@ string toLiteral(FunctionDeclaration decl) {
     auto parameters = conv(decl.parameters.tokens);
     auto functionBody = conv(decl.functionBody.tokens);
 
-    return format!"function %s %s %s %s"(attributes, returnType, parameters,  functionBody);
+    return format!"function %s %s %s %s"(attributes, returnType, parameters, functionBody);
 }
 
 string conv(const Token[] tokens) {
@@ -105,6 +104,7 @@ unittest {
     shouldSuccess(runner.run(q{ double y = 3.1415; }));
     shouldSuccess(runner.run(q{ import std; }));
     shouldSuccess(runner.run(q{ auto z = x * y; }));
+    shouldSuccess(runner.run(q{ auto t = 3.seconds; }));
     shouldSuccess(runner.run(q{ writeln(z); }));
     shouldSuccess(runner.run(q{ iota(x).map!(a => a * 2).writeln; }));
     shouldSuccess(runner.run(q{ 1+2 }));
