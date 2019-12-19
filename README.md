@@ -1,4 +1,5 @@
 # repl.d
+[![DUB Package](https://img.shields.io/dub/v/repl-d.svg)](https://code.dlang.org/packages/repl-d)
 [![CircleCI](https://circleci.com/gh/Sobaya007/repl.d.svg?style=svg)](https://circleci.com/gh/Sobaya007/repl.d)
 
 This project is a REPL tool for D programming language.
