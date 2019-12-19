@@ -75,7 +75,7 @@ class Evaluator {
         auto sourceCode = expand!("forBuildDependency.d", packageName, versionName);
         auto sourceFileName = createFile(sourceCode);
         scope (exit) sourceFileName.fremove();
-        auto result = executeShell("dub run --single " ~ sourceFileName);
+        auto result = executeShell("dub build --single " ~ sourceFileName);
         enforce(result.status == 0, result.output);
     }
 
