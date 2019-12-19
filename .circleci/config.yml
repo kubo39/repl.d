@@ -1,12 +1,33 @@
 version: 2
 jobs:
-  build:
+  test:
     docker:
       - image: dlang2/dmd-circleci:2.088.1
-
     steps:
       - checkout
       - run:
           name: Test
           command: dub test
-
+  docs:
+    docker:
+      - image: dlang2/dmd-circleci:2.088.1
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - "b1:7a:2e:9f:02:34:77:d0:20:02:f7:18:4a:2b:ab:eb"
+      - run:
+          name: Generate Document
+          command: bash .circleci/docs.sh
+workflows:
+  version: 2
+  genreate-docs:
+    jobs:
+      - test
+      - docs:
+          requires:
+            - test
+          filters:
+            branches:
+              only:
+                - master
