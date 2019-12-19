@@ -80,9 +80,6 @@ class REPLRunner {
                 if (decl.templateParameters) {
                     return fail("Template function is not allowed.");
                 }
-                if (decl.constraint) {
-                    return fail("Template constraint is not allowed.");
-                }
                 evaluator.evalVarDecl("auto", decl.name.text, toLiteral(*decl));
                 return success;
             }
@@ -104,8 +101,7 @@ class REPLRunner {
         } catch (SemanticException e) {
             return fail(e.msg);
         }
-
-        return success;
+        assert(false);
     }
 
     /**
@@ -216,6 +212,7 @@ unittest {
     shouldSuccess(runner.run(q{ iota(x).map!(a => a * 2).writeln; }));
     shouldSuccess(runner.run(q{ 1+2 }));
     shouldSuccess(runner.run(q{ void po() { writeln("po"); } }));
+    shouldFailure(runner.run(q{ void func(T)() { writeln(T.init); } }), "Template function is not allowed.");
     shouldSuccess(runner.run(q{ po(); }));
     shouldSuccess(runner.run(q{ auto doubleX = { return x *= 2; }; }));
     shouldSuccess(runner.run(q{ doubleX(); }));
