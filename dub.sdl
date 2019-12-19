@@ -1,5 +1,5 @@
 name "repl-d"
-description "A minimal D application."
+description "REPL application and library for D programming language"
 authors "sobaya"
 copyright "Copyright © 2019, sobaya"
 license "proprietary"
