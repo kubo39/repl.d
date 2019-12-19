@@ -1,3 +1,28 @@
+/++
+    Module just containing REPLRunner class
+
+	Copyright: © 2019 Sobaya007
+    License: use freely for any purpose
+	Authors: Sobaya007
+
+    Examples:
+    --------------------
+    import std;
+
+    auto runner = new REPLRunner(); // initialize runner
+    runner.addDependency("sbylib", "~master"); // add dependent library
+    
+    /* Read-Eval-Print Loop */
+    string input;
+    while (true) {
+        write("> ");
+        input ~= readln;
+        auto result = runner.run(input);
+        if (!result.success)
+            writeln(result.message);
+    }
+    --------------------
++/
 module repld.runner;
 
 import std;
@@ -6,6 +31,9 @@ import repld.evaluator;
 import dparse.ast;
 import dparse.lexer;
 
+/**
+    The main class of this library.
+ */
 class REPLRunner {
 
     static struct Result {
@@ -15,14 +43,25 @@ class REPLRunner {
 
     private Evaluator evaluator;
     
+    /**
+    Initialize execution environment
+    */
     this() {
         this.evaluator = new Evaluator;
     }
 
-    Result run(string line) {
-        if (line.chomp == "") return success; // accept empty line
+    /**
+    Execute the input.
 
-        auto parseResult = parse(line);
+    Params:
+       input = input text to be evaluated
+
+    Returns: evaluation result that contains the execution is successed and error message if failed
+    */
+    Result run(string input) {
+        if (input.chomp == "") return success; // accept empty input
+
+        auto parseResult = parse(input);
 
         try {
             if (auto decl = parseResult.peek!(VariableDeclaration)) {
@@ -69,6 +108,13 @@ class REPLRunner {
         return success;
     }
 
+    /**
+    Add dependency of dub registered package.
+
+    Params:
+       packageName = package name to be registered (ex. "mir-algorithm")
+       versionName = version of packge (ex. "~v0.0.1")
+    */
     void addDependency(string packageName, string versionName = "*") {
         evaluator.buildDependency(packageName, versionName);
         evaluator.addImportPath(descirbe(packageName, " --import-paths")
@@ -92,14 +138,32 @@ class REPLRunner {
             .array);
     }
 
+    /**
+    Get variable in an execution environment.
+
+    Params:
+       name = name of the variable
+
+    Returns: specified variable
+    */
     ref T get(T)(string name) {
         return evaluator.get!T(name);
     }
 
-    void set(T)(string name, T v) {
-        evaluator.set(name, v);
+    /**
+    Set variable in an execution environment.
+
+    Params:
+       name = name of the variable
+       value = value to be set
+    */
+    void set(T)(string name, T value) {
+        evaluator.set(name, value);
     }
 
+    /**
+    Alias of `set`.
+    */
     void opIndexAssign(T)(T value, string name) {
         set(name, value);
     }
@@ -119,11 +183,11 @@ class REPLRunner {
     }
 }
 
-string getType(VariableDeclaration decl) {
+private string getType(VariableDeclaration decl) {
     return conv(decl.type.tokens);
 }
 
-string toLiteral(FunctionDeclaration decl) {
+private string toLiteral(FunctionDeclaration decl) {
     auto returnType = decl.hasAuto ? "auto" : conv(decl.returnType.tokens);
     auto attributes = (decl.hasRef ? "ref" : "")
         ~ decl.memberFunctionAttributes.map!(a => conv(a.tokens)).join(" ")
@@ -135,7 +199,7 @@ string toLiteral(FunctionDeclaration decl) {
     return format!"function %s %s %s %s"(attributes, returnType, parameters, functionBody);
 }
 
-string conv(const Token[] tokens) {
+private string conv(const Token[] tokens) {
     return tokens.map!(t => t.text ? t.text : str(t.type)).join(" ");
 }
 
