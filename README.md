@@ -9,7 +9,8 @@ This package can be used for both single application and library.
 :heavy_check_mark: Function Declaration  
 :heavy_check_mark: Expression Evaluation  
 :heavy_check_mark: Module Import  
-:heavy_check_mark: Statement Execution  
+:heavy_check_mark: Statement Execution 
+:heavy_check_mark: Add Dub Project Dependency 
 :x: Template Function Declaration  
 :x: Struct or Class Declaration
 
