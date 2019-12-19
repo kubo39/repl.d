@@ -13,9 +13,9 @@ mkdir ~/.ssh && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ss
 dub build -b ddox
 mv docs ../
 
-git checkout docs
+git checkout gh-pages
 rm -r *
 mv ../docs/* ./
 git add -A --force .
 git diff-index --quiet HEAD || git commit -m "[skip ci] Update docs"
-git push origin docs
+git push origin gh-pages
