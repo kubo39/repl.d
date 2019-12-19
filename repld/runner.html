@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<title>Module repld.runner</title>
+		<link rel="stylesheet" type="text/css" href="../styles/ddox.css"/>
+		<link rel="stylesheet" href="../prettify/prettify.css" type="text/css"/>
+		<script type="text/javascript" src="../scripts/jquery.js">/**/</script><script type="text/javascript" src="../scripts/ddox.js">/**/</script>
+	</head>
+	<body onload="setupDdox();">
+		<nav id="main-nav">
+			<noscript>
+				<p style="color: red">The search functionality needs JavaScript enabled</p>
+			</noscript>
+			<div id="symbolSearchPane" style="display: none">
+				<form action="#" method="GET">
+					<input id="symbolSearch" type="text" name="q" placeholder="Search for symbols" autocomplete="off" onchange="performSymbolSearch(40);" onkeypress="this.onchange();" onpaste="this.onchange();" oninput="this.onchange();"/>
+				</form>
+				<ul id="symbolSearchResults" class="symbolList" style="display: none"></ul><script type="application/javascript" src="../symbols.js"></script><script type="application/javascript">var symbolSearchRootDir = "../";
+$('#symbolSearchPane').show();</script>
+			</div>
+			<ul class="tree-view">
+				<li class="tree-view ">
+					<div class="package ">repld
+					</div>
+			<ul class="tree-view">
+				<li>
+					<div class="module selected">
+						<a href="../repld/runner.html">runner</a>
+					</div>
+				</li>
+			</ul>
+				</li>
+			</ul>
+		</nav>
+		<div id="main-contents">
+			<h1>Module repld.runner</h1><p>Module just containing REPLRunner class
+</p><section></section>
+
+			<section><section><h2>Examples</h2>
+<pre class="code"><code class="lang-d"><span class="kwd">import </span><span class="pln">std</span><span class="pun">;
+
+</span><span class="kwd">auto </span><span class="pln">runner </span><span class="pun">= </span><span class="kwd">new <a href="../repld/runner/REPLRunner.html"></span><span class="typ">REPLRunner</span></a><span class="pun">(); </span><span class="com">// initialize runner
+</span><span class="pln">runner<wbr/></span><span class="pun">.</span><span class="pln">addDependency</span><span class="pun">(</span><span class="str">"sbylib"</span><span class="pun">, </span><span class="str">"~master"</span><span class="pun">); </span><span class="com">// add dependent library
+
+/* Read-Eval-Print Loop */
+</span><span class="typ">string </span><span class="pln">input</span><span class="pun">;
+</span><span class="kwd">while </span><span class="pun">(</span><span class="kwd">true</span><span class="pun">) {
+    </span><span class="pln">write</span><span class="pun">(</span><span class="str">"&gt; "</span><span class="pun">);
+    </span><span class="pln">input </span><span class="pun">~= </span><span class="pln">readln</span><span class="pun">;
+    </span><span class="kwd">auto </span><span class="pln">result </span><span class="pun">= </span><span class="pln">runner<wbr/></span><span class="pun">.</span><span class="pln">run</span><span class="pun">(</span><span class="pln">input</span><span class="pun">);
+    </span><span class="kwd">if </span><span class="pun">(!</span><span class="pln">result<wbr/></span><span class="pun">.</span><span class="pln">success</span><span class="pun">)
+        </span><span class="pln">writeln</span><span class="pun">(</span><span class="pln">result<wbr/></span><span class="pun">.</span><span class="pln">message</span><span class="pun">);
+}</span></code></pre>
+</section>
+</section>
+			<section>
+				<h2>Classes</h2>
+				<table>
+					<col class="caption"/>
+					<tr>
+						<th>Name</th><th>Description</th>
+					</tr>
+					<tr>
+						<td>
+							<code>
+								<a id="REPLRunner" class="public" href="../repld/runner/REPLRunner.html">REPLRunner</a>
+							</code>
+						</td>
+						<td>The main class of this library.
+</td>
+					</tr>
+				</table>
+			</section>
+			<footer>
+				<table class="license-info">
+					<tr>
+						<th>Authors</th>
+						<td>
+							<p>Sobaya007
+</p>
+
+						</td>
+					</tr>
+					<tr>
+						<th>Copyright</th>
+						<td>
+							<p>© 2019 Sobaya007
+</p>
+
+						</td>
+					</tr>
+					<tr>
+						<th>License</th>
+						<td>
+							<p>use freely for any purpose
+</p>
+
+						</td>
+					</tr>
+				</table>
+				<p class="faint">Generated using the DDOX documentation generator</p>
+			</footer>
+		</div>
+	</body>
+</html>
