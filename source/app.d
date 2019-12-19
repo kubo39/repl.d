@@ -5,7 +5,7 @@ void main() {
     auto runner = new REPLRunner();
     bool shouldExit = false;
     runner["exit"] = { shouldExit = true; };
-    runner.addDependency("sbylib", "~master");
+    runner["addDependency"] = (string packageName) => runner.addDependency(packageName);
 
     string input;
     while (!shouldExit) {
