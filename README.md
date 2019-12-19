@@ -17,3 +17,28 @@ This package can be used for both single application and library.
 ## Application use
 Just execute `dub` in the project root to start.
 If you want to break the line while input, type `|`.
+
+## Library use
+Documentation is [here](https://sobaya007.github.io/repl.d/).
+
+Simple REPL tools can be implemented like below:
+
+```d
+import std;
+import repld;
+
+void main() {
+    auto runner = new REPLRunner(); // initialize runner
+    runner.addDependency("sbylib", "~master"); // add dependent library
+
+    /* Read-Eval-Print Loop */
+    string input;
+    while (true) {
+        write("> ");
+        input ~= readln;
+        auto result = runner.run(input);
+        if (!result.success)
+            writeln(result.message);
+    }
+}
+```
