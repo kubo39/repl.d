@@ -118,12 +118,11 @@ class Evaluator {
         auto sourceFileName = createFile(sourceCode);
         scope (exit) sourceFileName.fremove();
         
-        auto dllName = sourceFileName.setExtension(".so");
+        auto dllName = sourceFileName.setExtension(dllExtension);
 
-        const result = executeShell(format!"dmd %s -g -shared -of=%s %s"(sourceFileName, dllName, args));
+        const result = executeShell(format!"dmd %s -g %s -of=%s %s"(sourceFileName, dllOption, dllName, args));
         enforce!SemanticException(result.status == 0, result.output);
-        scope (exit) dllName.fremove();
-        scope (exit) fremove(dllName.setExtension(".o"));
+        scope (exit) fremove(dllName.setExtension(objExtension));
 
         return new DLL(dllName);
     }
@@ -149,5 +148,17 @@ class Evaluator {
 
     private string libArgs() {
         return libs.map!(s => "-L-l"~s).join(" ");
+    }
+
+    version (Posix) {
+        private enum dllExtension = ".so";
+        private enum objExtension = ".o";
+        private enum dllOption = "-shared";
+    } else version (Windows) {
+        private enum dllExtension = ".dll";
+        private enum objExtension = ".obj";
+        private enum dllOption = "";
+    } else {
+        static assert(false, "This platform is not supported.");
     }
 }

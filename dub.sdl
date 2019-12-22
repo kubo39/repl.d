@@ -5,7 +5,7 @@ copyright "Copyright © 2019, sobaya"
 license "proprietary"
 
 dependency "libdparse" version="*"
-libs "dl" "phobos2"
+libs "dl" "phobos2" platform="posix"
 stringImportPaths "template"
 
 configuration "executable" {

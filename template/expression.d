@@ -3,7 +3,7 @@ ${imports}
 ${decls}
 ${param}
 
-void __func__(__Param__ __param__) {
+export void __func__(__Param__ __param__) {
     with (__param__) {
         static if (is(typeof(${expression}) == void)) {
             ${expression};
@@ -16,4 +16,4 @@ void __func__(__Param__ __param__) {
     }
 }
 
-extern(C) string __funcName__() { return __func__.mangleof; }
+export extern(C) string __funcName__() { return __func__.mangleof; }
