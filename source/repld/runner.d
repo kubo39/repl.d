@@ -206,6 +206,7 @@ unittest {
     shouldSuccess(runner.run(q{ import std; }));
     shouldFailure(runner.run(q{ import unknownPackage; }));
     shouldSuccess(runner.run(q{ auto z = x * y; }));
+    shouldSuccess(runner.run(q{ auto w = z; }));
     shouldSuccess(runner.run(q{ auto t = 3.seconds; }));
     shouldSuccess(runner.run(q{ writeln(z); }));
     shouldFailure(runner.run(q{ writeln(a); }), "Error: undefined identifier `a`");
