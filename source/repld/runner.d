@@ -152,12 +152,6 @@ class REPLRunner {
     private Result fail(string msg) {
         return Result(false, msg);
     }
-
-    private string descirbe(string packageName, string arg) {
-        auto result = executeShell("dub describe " ~ packageName ~ " " ~ arg);
-        enforce(result.status == 0, result.output);
-        return result.output;
-    }
 }
 
 private string getType(VariableDeclaration decl) {

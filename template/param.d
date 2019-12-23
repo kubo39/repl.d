@@ -13,7 +13,8 @@ struct __Param__ {
                     }
                     assert(false);
                 }
-            } else {
+            }
+            static if (!(isCallable!(${type}) && Parameters!(${type}).length == 0)) {
                 ref ${type} ${name}() {
                     if (auto val = "${name}" in __vals__) {
                         if (auto result = (*val)[0].peek!(${type})) {
