@@ -1,5 +1,5 @@
 /++ dub.sdl:
 name "${name}"
-dflags "${dllOption}" "-fPIC"
+dflags "${dllOption}" "${picOption}"
 ${dependencies}
 +/

@@ -5,7 +5,8 @@ copyright "Copyright © 2019, sobaya"
 license "proprietary"
 
 dependency "libdparse" version="*"
-libs "dl" "phobos2" platform="posix"
+libs "phobos2" platform="posix-dmd"
+dflags "-link-defaultlib-shared" platform="posix-ldc"
 stringImportPaths "template"
 
 configuration "executable" {

@@ -94,7 +94,8 @@ class Evaluator {
         auto name = sourceFileName.baseName.stripExtension;
         auto dependencies = dependencyText();
         auto dllOption = dllOption;
-        sourceCode = expand!("dubsetting.d", name, dependencies, dllOption) ~ sourceCode;
+        auto picOption = picOption;
+        sourceCode = expand!("dubsetting.d", name, dependencies, dllOption, picOption) ~ sourceCode;
 
         sourceFileName.fwrite(sourceCode);
         scope (exit) sourceFileName.fremove();
@@ -132,8 +133,10 @@ class Evaluator {
 
     version (DigitalMars) {
         private enum compiler = "dmd";
+        private enum picOption = "-fPIC";
     } else version (LDC) {
         private enum compiler = "ldc2";
+        private enum picOption = "--relocation-model=pic";
     } else {
         static assert(false, "This compiler is not supported.");
     }

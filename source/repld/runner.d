@@ -194,7 +194,7 @@ unittest {
     shouldSuccess(runner.run(q{ doubleX(); }));
     shouldSuccess(runner.run(q{ assert(x == 6); }));
     shouldFailure(runner.run(q{ auto a = 8 }), "Primary expression expected");
-    runner.addDependency("sbylib", "~master");
+    runner.addDependency("sbylib", "~>0.0.4");
     shouldSuccess(runner.run(q{ import sbylib.math; }));
     shouldSuccess(runner.run(q{ assert(mat2(1) * vec2(2,3) == vec2(5)); }));
 }
