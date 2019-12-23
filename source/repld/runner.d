@@ -112,26 +112,7 @@ class REPLRunner {
        versionName = version of packge (ex. "~v0.0.1")
     */
     void addDependency(string packageName, string versionName = "*") {
-        evaluator.buildDependency(packageName, versionName);
-        evaluator.addImportPath(descirbe(packageName, " --import-paths")
-            .split("\n")
-            .filter!(e => e != "")
-            .array);
-        auto libs = descirbe(packageName, " --data=linker-files")
-            .split(" ")
-            .filter!(e => e != "")
-            .map!(e => e.replaceAll(ctRegex!`'(.*)'`, "$1"))
-            .map!(e => e.stripRight)
-            .array;
-
-        evaluator.addLibPath(libs
-            .map!(l => l.dirName)
-            .array);
-
-        evaluator.addLibrary(libs
-            .map!(l => l.baseName)
-            .map!(l => l.replaceAll(ctRegex!`lib(.*)\.a`, "$1"))
-            .array);
+        evaluator.addDependency(packageName, versionName);
     }
 
     /**

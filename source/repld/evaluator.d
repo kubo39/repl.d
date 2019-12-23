@@ -17,9 +17,7 @@ class Evaluator {
     private GlobalVariables globalVariables;
     private Imports imports;
     private int dllSeed;
-    private string[] importPaths;
-    private string[] libPaths;
-    private string[] libs;
+    private string[2][] dependencies;
 
     this() {
         this.globalVariables = new GlobalVariables;
@@ -45,9 +43,7 @@ class Evaluator {
     }
 
     void evalImport(string expr) {
-        auto sourceFileName = createFile(expr);
-        auto result = executeShell(format!"dmd -c -o- %s %s"(sourceFileName, args));
-        enforce!SemanticException(result.status == 0, result.output);
+        createDLL(expr);
         imports.push(expr);
     }
 
@@ -71,25 +67,12 @@ class Evaluator {
         execute(sourceCode, params);
     }
 
-    void buildDependency(string packageName, string versionName) {
-        auto sourceCode = expand!("forBuildDependency.d", packageName, versionName);
-        auto sourceFileName = createFile(sourceCode);
-        scope (exit) sourceFileName.fremove();
-        auto result = executeShell("dub build --single " ~ sourceFileName);
-        enforce(result.status == 0, result.output);
-    }
-
     ref T get(T)(string name) {
         return globalVariables.get!T(name);
     }
 
-    alias addImportPath = add!importPaths;
-    alias addLibPath = add!libPaths;
-    alias addLibrary = add!libs;
-
-    private void add(alias mem)(string[] paths) {
-        mem ~= paths;
-        mem = mem.sort.uniq.array;
+    void addDependency(string packageName, string versionName) {
+        dependencies ~= [packageName, versionName];
     }
 
     private void execute(string sourceCode, Param param) {
@@ -107,39 +90,32 @@ class Evaluator {
     }
 
     private DLL createDLL(string sourceCode) {
-        auto sourceFileName = createFile(sourceCode);
+        auto sourceFileName = createSourceFileName();
+        auto name = sourceFileName.baseName.stripExtension;
+        auto dependencies = dependencyText();
+        auto dllOption = dllOption;
+        sourceCode = expand!("dubsetting.d", name, dependencies, dllOption) ~ sourceCode;
+
+        sourceFileName.fwrite(sourceCode);
         scope (exit) sourceFileName.fremove();
         
-        auto dllName = sourceFileName.setExtension(dllExtension);
+        auto dllName = sourceFileName.stripExtension;
 
-        const result = executeShell(format!"%s %s -g %s -of=%s %s"(compiler, sourceFileName, dllOption, dllName, args));
-        enforce!SemanticException(result.status == 0, result.output);
-        scope (exit) fremove(dllName.setExtension(objExtension));
+        const result = executeShell(format!"dub build %s --quiet --single --compiler=%s --build=debug"(sourceFileName, compiler));
+        enforce!SemanticException(result.status == 0,
+            result.output.split("\n")[0..$-2].join("\n")); // cut unnecessary line
 
         return new DLL(dllName);
     }
 
-    private string createFile(string sourceCode) {
+    private string createSourceFileName() {
         scope (exit) dllSeed++;
         auto sourceFileName = tempDir.buildPath(format!"test%d.d"(dllSeed));
-        sourceFileName.fwrite(sourceCode);
         return sourceFileName;
     }
 
-    private string args() {
-        return [importSearchArgs, libArgs, libSearchArgs].join(" ");
-    }
-
-    private string importSearchArgs() {
-        return importPaths.map!(s => "-I"~s).join(" ");
-    }
-
-    private string libSearchArgs() {
-        return libPaths.map!(s => "-L-L"~s).join(" ");
-    }
-
-    private string libArgs() {
-        return libs.map!(s => "-L-l"~s).join(" ");
+    private string dependencyText() {
+        return dependencies.map!(d => format!q{dependency "%s" version="%s"}(d[0], d[1])).join("\n");
     }
 
     version (Posix) {
