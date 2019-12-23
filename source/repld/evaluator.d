@@ -92,14 +92,6 @@ class Evaluator {
         mem = mem.sort.uniq.array;
     }
 
-    private string expand(string templateFileName, Args...)() {
-        auto result  = import(templateFileName);
-        static foreach (arg; Args) {
-            result = result.replace(format!"${%s}"(arg.stringof), arg);
-        }
-        return result;
-    }
-
     private void execute(string sourceCode, Param param) {
         auto dll = createDLL(sourceCode);
         auto funcName = dll.loadFunction!(string function())("__funcName__")();
@@ -120,7 +112,7 @@ class Evaluator {
         
         auto dllName = sourceFileName.setExtension(dllExtension);
 
-        const result = executeShell(format!"dmd %s -g %s -of=%s %s"(sourceFileName, dllOption, dllName, args));
+        const result = executeShell(format!"%s %s -g %s -of=%s %s"(compiler, sourceFileName, dllOption, dllName, args));
         enforce!SemanticException(result.status == 0, result.output);
         scope (exit) fremove(dllName.setExtension(objExtension));
 
@@ -161,4 +153,21 @@ class Evaluator {
     } else {
         static assert(false, "This platform is not supported.");
     }
+
+    version (DigitalMars) {
+        private enum compiler = "dmd";
+    } else version (LDC) {
+        private enum compiler = "ldc2";
+    } else {
+        static assert(false, "This compiler is not supported.");
+    }
 }
+
+private string expand(string templateFileName, Args...)() {
+    auto result  = import(templateFileName);
+    static foreach (arg; Args) {
+        result = result.replace(format!"${%s}"(arg.stringof), arg);
+    }
+    return result;
+}
+
