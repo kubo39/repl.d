@@ -2,7 +2,7 @@ name "repl-d"
 description "REPL application and library for D programming language"
 authors "sobaya"
 copyright "Copyright © 2019, sobaya"
-license "proprietary"
+license "MIT"
 
 dependency "libdparse" version="*"
 libs "phobos2" platform="posix-dmd"
