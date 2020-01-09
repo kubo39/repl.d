@@ -2,6 +2,7 @@
 	"fileVersion": 1,
 	"versions": {
 		"libdparse": "0.13.1",
+		"libloading": "0.1.0",
 		"stdx-allocator": "2.77.5"
 	}
 }

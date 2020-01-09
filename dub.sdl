@@ -5,6 +5,7 @@ copyright "Copyright © 2019, sobaya"
 license "MIT"
 
 dependency "libdparse" version="*"
+dependency "libloading" version="~>0.1.0"
 libs "phobos2" platform="posix-dmd"
 dflags "-link-defaultlib-shared" platform="posix-ldc"
 stringImportPaths "template"
